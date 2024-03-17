@@ -37,6 +37,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+// Add IntegrationService to the DI container
+builder.Services.AddScoped<IntegrationService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

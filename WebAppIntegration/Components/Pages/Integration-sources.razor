@@ -1,0 +1,104 @@
+@page "/integration-sources"
+@using WebAppIntegration.Model
+
+<PageTitle>Integration Sources</PageTitle>
+
+<h1>Integration Sources</h1>
+
+@if (integrationSources == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Path</th>
+                <th>File Extension</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var source in integrationSources)
+            {
+                <tr>
+                    <td>@source.Name</td>
+                    <td>@source.Type</td>
+                    <td>@source.Value</td>
+                    <td>@source.Path</td>
+                    <td>@source.FileExtension</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<EditForm Model="@newIntegrationSource" OnValidSubmit="@AddIntegrationSource" FormName="integrationForm">
+    <h2>Add Integration Source</h2>
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="newIntegrationSource.Name" class="form-control" id="name" />
+        <label for="name" class="form-label">Name</label>
+    </div>
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="newIntegrationSource.Type" class="form-control" id="type" />
+        <label for="type" class="form-label">Type</label>
+    </div>
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="newIntegrationSource.Value" class="form-control" id="value" />
+        <label for="value" class="form-label">Value</label>
+    </div>
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="newIntegrationSource.Path" class="form-control" id="path" />
+        <label for="path" class="form-label">Path</label>
+    </div>
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="newIntegrationSource.FileExtension" class="form-control" id="extension" />
+        <label for="extension" class="form-label">File Extension</label>
+    </div>
+    <button type="submit" class="w-100 btn btn-lg btn-primary">Add Source</button>
+</EditForm>
+
+@code {
+    private List<IntegrationSource> integrationSources;
+
+    [SupplyParameterFromForm]
+    private IntegrationSource newIntegrationSource { get; set; } = new();
+   
+    private string userId;
+
+    [Inject]
+    private IntegrationService IntegrationService { get; set; }
+    [Inject]
+    private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        userId = authState.User.Identity.Name;
+
+        if (!string.IsNullOrEmpty(userId))
+        {
+            integrationSources = await IntegrationService.GetIntegrationSourcesAsync(userId);
+        }
+        else
+        {
+            // Handle case where user ID is not available
+            // For example, redirect to login page or display an error message
+        }
+    }
+
+    private async Task AddIntegrationSource()
+    {
+        integrationSources.Add(newIntegrationSource);
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        userId = authState.User.Identity.Name;
+        newIntegrationSource.UserId=userId;
+
+        await IntegrationService.AddIntegrationSourceAsync(newIntegrationSource, userId);
+
+        newIntegrationSource = new IntegrationSource();
+    }
+}
