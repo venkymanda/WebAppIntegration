@@ -27,4 +27,38 @@ public class IntegrationService
         _dbContext.IntegrationSource.Add(integrationSource);
         await _dbContext.SaveChangesAsync();
     }
+
+     public async Task UpdateIntegrationSourceAsync(IntegrationSource updatedIntegrationSource)
+    {
+        var existingIntegrationSource = await _dbContext.IntegrationSource.FindAsync(updatedIntegrationSource.Id);
+
+        if (existingIntegrationSource == null)
+        {
+            throw new ArgumentException("Integration source not found");
+        }
+
+        // Update properties of existingIntegrationSource with updatedIntegrationSource
+        existingIntegrationSource.Name = updatedIntegrationSource.Name;
+        existingIntegrationSource.Type = updatedIntegrationSource.Type;
+        existingIntegrationSource.Value = updatedIntegrationSource.Value;
+        existingIntegrationSource.Path = updatedIntegrationSource.Path;
+        existingIntegrationSource.FileExtension = updatedIntegrationSource.FileExtension;
+
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteIntegrationSourceAsync(int integrationSourceId)
+    {
+        var integrationSource = await _dbContext.IntegrationSource.FindAsync(integrationSourceId);
+
+        if (integrationSource != null)
+        {
+            _dbContext.IntegrationSource.Remove(integrationSource);
+            await _dbContext.SaveChangesAsync();
+        }
+        else
+        {
+            throw new ArgumentException("Integration source not found");
+        }
+    }
 }

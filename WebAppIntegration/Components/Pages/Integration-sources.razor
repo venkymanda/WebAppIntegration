@@ -1,10 +1,49 @@
 @page "/integration-sources"
+@rendermode InteractiveServer
+
 @using WebAppIntegration.Model
 
 <PageTitle>Integration Sources</PageTitle>
 
 <h1>Integration Sources</h1>
 
+
+
+
+<style>
+        /* Style for overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+            z-index: 9999; /* Ensure it's on top of other elements */
+            backdrop-filter: blur(5px); /* Apply a blur effect to the background */
+        }
+
+        /* Style for form container */
+       .form-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+
+
+    <script>
+        function toggleOverlay() {
+            var overlay = document.getElementById('overlay');
+            overlay.style.display = (overlay.style.display == 'none') ? 'block' : 'none';
+        }
+    </script>
 @if (integrationSources == null)
 {
     <p><em>Loading...</em></p>
@@ -12,6 +51,46 @@
 else
 {
     <table class="table">
+        <thead>
+            <button onclick="toggleOverlay()" class="btn btn-primary mb-3">Add Source</button>
+           
+    <div id="overlay" class="overlay">
+        <div class="form-container">
+            
+            <EditForm Model="@newIntegrationSource" OnValidSubmit="@AddIntegrationSource" FormName="integrationForm">
+            <h2>Add Integration Source</h2>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="newIntegrationSource.Name" class="form-control" id="name" />
+                <label for="name" class="form-label">Name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <select @bind="newIntegrationSource.Type" class="form-control" id="type">
+                    <option value="">Select File Type</option>
+                    <option value="PDF">PDF</option>
+                    <option value="Word">Word</option>
+                    <option value="Excel">Excel</option>
+                    <!-- Add more file types as needed -->
+                </select>
+                <label for="type" class="form-label">Type</label>
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="newIntegrationSource.Value" class="form-control" id="value" />
+                <label for="value" class="form-label">Value</label>
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="newIntegrationSource.Path" class="form-control" id="path" />
+                <label for="path" class="form-label">Path</label>
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="newIntegrationSource.FileExtension" class="form-control" id="extension" />
+                <label for="extension" class="form-label">File Extension</label>
+            </div>
+            <button type="button" class="w-100 btn btn-lg btn-primary" onclick="toggleOverlay()">Cancel</button>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Add Source</button>
+        </EditForm>
+        </div>
+    </div>
+        </thead>
         <thead>
             <tr>
                 <th>Name</th>
@@ -30,36 +109,62 @@ else
                     <td>@source.Value</td>
                     <td>@source.Path</td>
                     <td>@source.FileExtension</td>
+                    <td>
+                        
+                        <button class="btn btn-danger" @onclick="() => DeleteIntegrationSource(source)">Delete</button>
+                        <button class="btn btn-primary" @onclick="() => SetSelectedIntegrationSource(source)">Update</button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
-}
 
-<EditForm Model="@newIntegrationSource" OnValidSubmit="@AddIntegrationSource" FormName="integrationForm">
-    <h2>Add Integration Source</h2>
-    <div class="form-floating mb-3">
-        <InputText @bind-Value="newIntegrationSource.Name" class="form-control" id="name" />
-        <label for="name" class="form-label">Name</label>
+    @if (showUpdateOverlay)
+    {
+     <div id="updateoverlay" class="updateoverlay">
+        <div class="updateform-container">
+            
+            <EditForm Model="@selectedIntegrationSource" OnValidSubmit="@UpdateIntegrationSource" FormName="integrationFormupdate">
+            <h2>Update Integration Source</h2>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="selectedIntegrationSource.Name" class="form-control" id="name" />
+                <label for="name" class="form-label">Name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <select @bind="selectedIntegrationSource.Type" class="form-control" id="type">
+                    <option value="">Select File Type</option>
+                    <option value="PDF">PDF</option>
+                    <option value="Word">Word</option>
+                    <option value="Excel">Excel</option>
+                    <!-- Add more file types as needed -->
+                </select>
+                <label for="type" class="form-label">Type</label>
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="selectedIntegrationSource.Value" class="form-control" id="value" />
+                <label for="value" class="form-label">Value</label>
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="selectedIntegrationSource.Path" class="form-control" id="path" />
+                <label for="path" class="form-label">Path</label>
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="selectedIntegrationSource.FileExtension" class="form-control" id="extension" />
+                <label for="extension" class="form-label">File Extension</label>
+            </div>
+            <button type="button" class="w-100 btn btn-lg btn-primary" onclick="@toggleUpdateOverlay">Cancel</button>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Update Source</button>
+        </EditForm>
+        </div>
     </div>
-    <div class="form-floating mb-3">
-        <InputText @bind-Value="newIntegrationSource.Type" class="form-control" id="type" />
-        <label for="type" class="form-label">Type</label>
-    </div>
-    <div class="form-floating mb-3">
-        <InputText @bind-Value="newIntegrationSource.Value" class="form-control" id="value" />
-        <label for="value" class="form-label">Value</label>
-    </div>
-    <div class="form-floating mb-3">
-        <InputText @bind-Value="newIntegrationSource.Path" class="form-control" id="path" />
-        <label for="path" class="form-label">Path</label>
-    </div>
-    <div class="form-floating mb-3">
-        <InputText @bind-Value="newIntegrationSource.FileExtension" class="form-control" id="extension" />
-        <label for="extension" class="form-label">File Extension</label>
-    </div>
-    <button type="submit" class="w-100 btn btn-lg btn-primary">Add Source</button>
-</EditForm>
+    }
+}
+    
+    
+
+
+
+
 
 @code {
     private List<IntegrationSource> integrationSources;
@@ -69,10 +174,21 @@ else
    
     private string userId;
 
+    private bool showUpdateOverlay = false;
+
+
+   
+
+    [SupplyParameterFromForm]
+    private IntegrationSource selectedIntegrationSource{get;set;}=new();
+
     [Inject]
     private IntegrationService IntegrationService { get; set; }
     [Inject]
     private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+   
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -101,4 +217,73 @@ else
 
         newIntegrationSource = new IntegrationSource();
     }
+
+    private async Task DeleteIntegrationSource(IntegrationSource indx)
+    {
+        // Implement logic to delete the integration source
+        await IntegrationService.DeleteIntegrationSourceAsync(indx.Id);
+        await LoadIntegrationSources(); // Reload the integration sources after update
+    }
+
+     private async Task LoadIntegrationSources()
+     {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var userId = authState.User.Identity.Name;
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                integrationSources = await IntegrationService.GetIntegrationSourcesAsync(userId);
+                StateHasChanged(); // Update the UI to reflect the changes
+            }
+            else
+            {
+                // Handle case where user ID is not available
+                // For example, redirect to login page or display an error message
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions, e.g., display an error message
+            Console.WriteLine($"Error loading integration sources: {ex.Message}");
+        }
+    }
+
+    private void SetSelectedIntegrationSource(IntegrationSource source)
+    {
+        selectedIntegrationSource = source;
+        showUpdateOverlay = true; // Set the flag to true to show the update overlay
+        StateHasChanged(); 
+    }
+
+    private async Task UpdateIntegrationSource()
+    {
+
+        try
+        {
+            
+            await IntegrationService.UpdateIntegrationSourceAsync(selectedIntegrationSource);
+            await LoadIntegrationSources(); // Reload the integration sources after update
+            showUpdateOverlay = false;
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions, e.g., display an error message
+            Console.WriteLine($"Error updating integration source: {ex.Message}");
+        }
+    }
+
+    private void toggleUpdateOverlay()
+    {
+        showUpdateOverlay=!showUpdateOverlay;
+
+    }
+
+    
+
+
+  
+
+
 }

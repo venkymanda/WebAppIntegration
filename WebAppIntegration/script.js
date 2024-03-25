@@ -2,6 +2,9 @@
 window.addEventListener('DOMContentLoaded', function() {
     loadConnections();
     displayActiveConfigurations();
+    toggleOverlay();
+    closeOnEscape();
+    //toggleOverlayupdate();
 });
 
 // Function to load connections from local storage
@@ -52,4 +55,42 @@ function displayActiveConfigurations() {
         listItem.textContent = configuration;
         activeConfigurationsList.appendChild(listItem);
     });
+}
+
+/*function toggleOverlay() {
+            var overlay = document.getElementById('overlay');
+            overlay.style.display = (overlay.style.display == 'none') ? 'block' : 'none';
+        }
+*/
+function toggleOverlay() {
+    var overlay = document.getElementById('overlay');
+    if (overlay.style.display == 'none' || overlay.style.display == '') {
+        overlay.style.display = 'block';
+        // Add event listener to close overlay when Escape key is pressed
+        document.addEventListener('keydown', closeOnEscape);
+    } else {
+        overlay.style.display = 'none';
+        // Remove event listener when overlay is closed
+        document.removeEventListener('keydown', closeOnEscape);
+    }
+}
+
+function toggleOverlayupdate() {
+    var overlay = document.getElementById('updateoverlay');
+    if (overlay.style.display == 'none' || overlay.style.display == '') {
+        overlay.style.display = 'block';
+        // Add event listener to close overlay when Escape key is pressed
+        document.addEventListener('keydown', closeOnEscape);
+    } else {
+        overlay.style.display = 'none';
+        // Remove event listener when overlay is closed
+        document.removeEventListener('keydown', closeOnEscape);
+    }
+}
+
+// Function to close overlay when Escape key is pressed
+function closeOnEscape(event) {
+    if (event.key === "Escape") {
+        toggleOverlay(); // Close overlay
+    }
 }
