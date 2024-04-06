@@ -66,9 +66,12 @@ else
             <div class="form-floating mb-3">
                 <select @bind="newIntegrationSource.Type" class="form-control" id="type">
                     <option value="">Select File Type</option>
-                    <option value="PDF">PDF</option>
-                    <option value="Word">Word</option>
-                    <option value="Excel">Excel</option>
+                    <option value="SFTP">SFTP</option>
+                    <option value="FTP">FTP</option>
+                    <option value="WebService">WebService</option>
+                    <option value="Azure Storage">Azure Storage</option>
+                    <option value="REST API">REST API</option>
+                    <option value="Local Folder">Local Folder</option>
                     <!-- Add more file types as needed -->
                 </select>
                 <label for="type" class="form-label">Type</label>
@@ -113,6 +116,7 @@ else
                         
                         <button class="btn btn-danger" @onclick="() => DeleteIntegrationSource(source)">Delete</button>
                         <button class="btn btn-primary" @onclick="() => SetSelectedIntegrationSource(source)">Update</button>
+                         <button class="btn btn-success" @onclick="() => ToggleIntegrationSourceState(source)">@((source.IsEnabled ? "Disable" : "Resume"))</button>
                     </td>
                 </tr>
             }
@@ -133,9 +137,12 @@ else
             <div class="form-floating mb-3">
                 <select @bind="selectedIntegrationSource.Type" class="form-control" id="type">
                     <option value="">Select File Type</option>
-                    <option value="PDF">PDF</option>
-                    <option value="Word">Word</option>
-                    <option value="Excel">Excel</option>
+                    <option value="SFTP">SFTP</option>
+                    <option value="FTP">FTP</option>
+                    <option value="WebService">WebService</option>
+                    <option value="Azure Storage">Azure Storage</option>
+                    <option value="REST API">REST API</option>
+                    <option value="Local Folder">Local Folder</option>
                     <!-- Add more file types as needed -->
                 </select>
                 <label for="type" class="form-label">Type</label>
@@ -280,7 +287,16 @@ else
 
     }
 
-    
+    private async Task ToggleIntegrationSourceState(IntegrationSource source)
+    {
+        source.IsEnabled = !source.IsEnabled;
+        // Implement logic to update the integration source state in the database
+        // You can call your IntegrationService method here to update the state
+        // For example:
+        // await IntegrationService.UpdateIntegrationSourceStateAsync(source);
+        await LoadIntegrationSources(); // Reload the integration sources after update
+    }
+
 
 
   

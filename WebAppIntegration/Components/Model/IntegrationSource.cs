@@ -15,5 +15,6 @@ namespace WebAppIntegration.Model
         public string Path { get; set; }
         public string FileExtension { get; set; }
         public string UserId {get;set;}
+        public bool IsEnabled { get; set; }
     }
 }
